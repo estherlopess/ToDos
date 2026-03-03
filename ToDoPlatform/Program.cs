@@ -1,6 +1,13 @@
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+string conexao = builder.Configuration.GetConnectionString("Conexao");
+builder.Services.AddDbContext<AppDbContext>(
+    options => Options.UseMySql (conexao)
+);
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -27,3 +34,4 @@ app.MapControllerRoute(
 
 
 app.Run();
+
