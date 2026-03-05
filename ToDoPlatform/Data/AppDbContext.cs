@@ -6,15 +6,13 @@ using ToDoPlatform.Models;
 
 namespace ToDoPlatform.Data;
 
-    public class AppDbContext : IdentityDbContext<AppUser>
+public class AppDbContext : IdentityDbContext<AppUser>
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options):base(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options):base(options)
-        {
-        }
-        public DbSet<AppUser> AppUsers{ get;set;}
-        
-        public DbSet<ToDo> ToDos {get;set;
-
+    }
+    public DbSet<AppUser> AppUsers{ get; set;}
+    public DbSet<ToDo> ToDos {get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -30,4 +28,4 @@ namespace ToDoPlatform.Data;
         
     } 
 
-    }
+}
