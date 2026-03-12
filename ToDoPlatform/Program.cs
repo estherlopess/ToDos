@@ -18,7 +18,7 @@ builder.Services.AddIdentity<AppUser,IdentityRole>(
     }
 
 )
-.AddEntityFrameworlStores<AppDbContext>()
+.AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
@@ -42,7 +42,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UserAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
 
 
