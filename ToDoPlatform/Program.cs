@@ -21,6 +21,9 @@ builder.Services.AddIdentity<AppUser,IdentityRole>(
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+// Registro do serviço de usuário 
+builder.Services.AddTransient<IUserService, UserService>(); 
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -55,4 +58,5 @@ app.MapControllerRoute(
 
 
 app.Run();
+
 
