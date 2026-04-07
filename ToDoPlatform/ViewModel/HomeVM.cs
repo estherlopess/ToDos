@@ -1,6 +1,6 @@
 // ViewModels/HomeVM.cs
 using ToDoPlatform.Models;
-namespace ToDoPlatform.ViewModels;
+namespace ToDoPlatform.ViewModel;
 public class HomeVM
 {
 public int TotalTasks { get; set; }
