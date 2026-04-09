@@ -7,6 +7,7 @@ using ToDoPlatform.Models;
 using ToDoPlatform.Services;
 using ToDoPlatform.ViewModels;
 
+
 namespace ToDoPlatform.Controllers;
 
 [Authorize]
@@ -109,6 +110,36 @@ public class HomeController : Controller
             });
         }  
     }
+    public IActionResult AddTask()
+    {
+         return View();
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddTask(AddTaskVM addTask)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userService.GetLoggedUser();
+            if (user == null)
+        {
+            TempData["Failure"] = "Sua sessão expirou, faça login novamente!";
+        }
+        else
+        {
+            ToDo toDo = new()
+            {
+                Title = addTask.Title,
+                Description = addTask.Description,
+                UserId = user.Id
+            };
+await _dbContext.ToDos.AddAsync(toDo);
+await _dbContext.SaveChangesAsync();
+TempData["Success"] = "Tarefa criada com sucesso! Redirecionando...";
+        }
+    }
+    return View(addTask);
+}
     [AllowAnonymous]
     public IActionResult Privacy()
     {

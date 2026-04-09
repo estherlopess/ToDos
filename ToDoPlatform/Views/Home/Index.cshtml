@@ -1,4 +1,5 @@
-﻿@model HomeVM
+﻿
+@model HomeVM
 @{
     ViewData["Title"] = "Home";
 }
@@ -21,7 +22,7 @@
         <h2 class="section-title"><span>📋</span> Tarefas em Aberto</h2>
         <a href="<!-- Botão no cabeçalho da seção -->
             <a asp-action=" AddTask" class="btn-add">
-            <span> </span> Nova Tarefa
+            <span>➕ </span> Nova Tarefa
         </a>
         <!-- Link no estado vazio --> <a asp-action="AddTask" style="color: #667eea; text-decoration: none;">
         Criar sua primeira tarefa
