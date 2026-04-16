@@ -8,51 +8,51 @@ public class AppDbSeed
 {
     public AppDbSeed(ModelBuilder builder)
     {
-        #region Popular Perfis de usuarios
+        #region Popular Perfis de usuários
         List<IdentityRole> roles = new()
+        {
+            new()
             {
-                new()
-                {
-                    Id="2eaf96b7-9e52-47c6-a66b-4124f04f9855",
-                    Name= "Administrador",
-                    NormalizedName="ADMINISTRADOR"
-                },
+                Id = "ff0c5ccb-7420-4626-84bc-acbe97a09cb1",
+                Name = "Administrador",
+                NormalizedName = "ADMINISTRADOR"
+            },
                  new()
-                {
-                    Id="5da8f6f4-eae6-4d24-ab1f-a3adaadf3f51",
-                    Name= "Usuários",
-                    NormalizedName="USUÁRIO"
-                }
-            };
+            {
+                Id = "27d146a3-f6d3-4c2b-96be-8321d7a885a6",
+                Name = "Administrador",
+                NormalizedName = "ADMINISTRADOR"
+            },
+        };
         builder.Entity<IdentityRole>().HasData(roles);
         #endregion
 
-        #region Popular dados de Usuario
+        #region Popular dados de Usuário
         List<AppUser> users = new()
         {
             new AppUser()
             {
-                Id = "8aab3d25-3320-4d46-9407-cb03a9380a4b",
-                Email = "estherlopes678@gmail.com",
-                NormalizedEmail= "ESTHERLOPES678@GMAIL.COM",
-                UserName = "estherlopes678@gmail.com",
-                NormalizedUserName= "ESTHERLOPES678@GMAIL.COM",
+                Id = "405faf1b-5420-493c-a3f9-aa05e7247a43",
+                Email = "nicolyathayde4@gmail.com",
+                NormalizedEmail = "NICOLYATHAYDE4@GMAIL",
+                UserName = "nicolyathayde4@gmail.com",
+                NormalizedUserName = "NICOLYATHAYDE4@GMAIL.COM",
                 LockoutEnabled = false,
-                EmailConfirmed= true,
-                Name ="Esther Lopes",
-                ProfilePicture = "/img/users/Id = 8aab3d25-3320-4d46-9407-cb03a9380a4b.png"
+                EmailConfirmed = true,
+                Name = "Nicoly Athayde Silva Oliveira",
+                ProfilePicture = "/img/user/405faf1b-5420-493c-a3f9-aa05e7247a43.png"
             },
-             new AppUser()
+            new AppUser()
             {
-                Id = "a5047c93-a48e-47a7-98ed-559f65da4855",
-                Email = "larissafantinatti24@gmail.com",
-                NormalizedEmail= "LARISSAFANTINATTI24@GMAIL.COM",
-                UserName = "larissafantinatti24@gmail.com",
-                NormalizedUserName= "LARISSAFANTINATTI24@GMAIL.COM",
+                Id = "1830a86c-dea3-460a-9538-222fc1c83063",
+                Email = "amandabordotti12@gmail.com",
+                NormalizedEmail = "AMANDABORDOTTI12@GMAIL",
+                UserName = "amandabordotti12@gmail.com",
+                NormalizedUserName = "AMANDABORDOTTI12@GMAIL.COM",
                 LockoutEnabled = true,
-                EmailConfirmed= true,
-                Name ="Larissa Fantinatti",
-                ProfilePicture = "/img/users/Id = a5047c93-a48e-47a7-98ed-559f65da4855.png"
+                EmailConfirmed = true,
+                Name = "Amanda Bordotti",
+                ProfilePicture = "/img/user/1830a86c-dea3-460a-9538-222fc1c83063.png"
             },
         };
         foreach (var user in users)
@@ -63,10 +63,9 @@ public class AppDbSeed
         builder.Entity<AppUser>().HasData(users);
         #endregion
 
-        #region Popular Dados de Perfil
+        #region Popular Dados de Usuário Perfil
         List<IdentityUserRole<string>> userRoles = new()
         {
-            
             new IdentityUserRole<string>()
             {
                 UserId = users[0].Id,
@@ -74,40 +73,39 @@ public class AppDbSeed
             },
             new IdentityUserRole<string>()
             {
-                UserId= users[1].Id,
+                UserId = users[1].Id,
                 RoleId = roles[1].Id
             },
         };
         builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
-    #endregion
-    
-    #region Popular as Tarefas do usuário
-    List<ToDo> toDos= new()
-    {
-        new ToDo()
-        {
-            Id= 1,
-            Title = "seminario da meire",
-            Description ="fazer os slides o resto",
-            UserId =users[1].Id
-        },
-          new ToDo()
-        {
-            Id= 2,
-            Title = "Tomar mais agua",
-            Description ="precisamos tomar mais agua ",
-            UserId =users[1].Id
-        },
-          new ToDo()
-        {
-            Id= 3,
-            Title = "ir embora da escola",
-            Description ="Temos que ir para a casinha",
-            UserId =users[1].Id
-        },
-    };
-    builder.Entity<ToDo>().HasData(toDos);
-    #endregion
-    }
+        #endregion
 
+        #region Popular as Tarefas do usuário
+        List<ToDo> toDos = new()
+        {
+            new ToDo()
+            {
+                Id = 1,
+                Title = "Terminar coreografia das crianças",
+                Description = "Fazer uma sequência em aula",
+                UserId = users[1].Id
+            },
+            new ToDo()
+            {
+                Id = 2,
+                Title = "Responder o formulário",
+                Description = "Urgente",
+                UserId = users[1].Id
+            },
+            new ToDo()
+            {
+                Id = 3,
+                Title = "Passar uma diagonal",
+                Description = "Não esquecer",
+                UserId = users[1].Id
+            },
+        };
+        builder.Entity<ToDo>().HasData(toDos);
+        #endregion
+    }
 }

@@ -1,3 +1,4 @@
+// Controllers/HomeController.cs
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,47 +7,38 @@ using ToDoPlatform.Data;
 using ToDoPlatform.Models;
 using ToDoPlatform.Services;
 using ToDoPlatform.ViewModels;
-
-
 namespace ToDoPlatform.Controllers;
-
 [Authorize]
+
 public class HomeController : Controller
 {
     private readonly AppDbContext _dbContext;
     private readonly IUserService _userService;
-
-    public HomeController(AppDbContext dbContext, IUserService userService)
+    public HomeController(AppDbContext dbContext, IUserService
+userService)
     {
         _dbContext = dbContext;
         _userService = userService;
-    }
+    }  
 
     public async Task<IActionResult> Index()
     {
         var user = await _userService.GetLoggedUser();
-
-        if (user == null)
-        {
-            return RedirectToAction("Login", "Auth");
-        }
-
-        var todos = await _dbContext.ToDos
-            .AsNoTracking()
-            .Where(t => t.UserId == user.Id)
-            .ToListAsync();
-
-        var openTodos = todos
-            .Where(t => !t.Done)
+        var openTodos = await _dbContext.ToDos
+            .Where(t => t.UserId == user.Id && !t.Done)
             .OrderByDescending(t => t.CreatedAt)
             .ThenBy(t => t.Title)
-            .ToList();
+            .ToListAsync();
+        var totalTasks = await _dbContext.ToDos.CountAsync(t => t.UserId
+== user.Id);
+        var endedTasks = await _dbContext.ToDos.CountAsync(t => t.UserId
+== user.Id && t.Done);
 
         HomeVM homeVM = new()
-        {
-            TotalTasks = todos.Count,
+        {  
+            TotalTasks = totalTasks,
             OpenTasks = openTodos.Count,
-            EndedTasks = todos.Count(t => t.Done),
+            EndedTasks = endedTasks,
             ToDos = openTodos
         };
 
@@ -56,72 +48,79 @@ public class HomeController : Controller
     [HttpPost]
     public async Task<IActionResult> EndTask(int? id)
     {
-        if (!id.HasValue)
+        if (id == null)
         {
             return Json(new
             {
                 success = false,
-                message = "Problemas ao carregar a tarefa!"
+                message = "Problemas ao carregar a tarefa! Tente novamente mais tarde..."
             });
         }
-
+        var todo = await _dbContext.ToDos.Where(t => t.Id ==
+id).SingleOrDefaultAsync();
+        if (todo == null)
+        {
+            return Json(new
+            {          
+                success = false,
+                message = "Não foi possível localizar a tarefa! Tente novamente mais tarde..."
+            });
+        }
         var user = await _userService.GetLoggedUser();
-
         if (user == null)
         {
             return Json(new
             {
                 success = false,
-                message = "Sua sessão expirou!",
+                message = "Sua sessão expirou, faça login para continuar!",
                 redirect = true
             });
         }
-
-        var todo = await _dbContext.ToDos
-            .Where(t => t.Id == id && t.UserId == user.Id)
-            .SingleOrDefaultAsync();
-
-        if (todo == null)
+        if (todo.UserId != user.Id)
         {
             return Json(new
             {
                 success = false,
-                message = "Tarefa não encontrada ou sem permissão!"
+                message = "Você não tem permissão para alterar esta tarefa!"
             });
         }
-
         try
         {
             todo.Done = true;
-            await _dbContext.SaveChangesAsync();
+            _dbContext.ToDos.Update(todo);
+            _dbContext.SaveChanges();
 
             return Json(new
             {
                 success = true,
-                message = "Tarefa finalizada com sucesso!"
+                message = "Tarefa finalizada com sucesso! Recarregando Lista..."
             });
         }
-        catch
+        catch (Exception ex)
         {
             return Json(new
             {
                 success = false,
-                message = "Erro ao finalizar tarefa."
+                message = "Ocorreu um problema ao finalizar a tarefa! Tente novamente mais tarde...",
+                details = ex.Message
             });
-        }  
+        }
     }
-    public IActionResult AddTask()
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None,
+NoStore = true)]
+
+public IActionResult AddTask()
+{
+ return View();
+}
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> AddTask(AddTaskVM addTask)
+{
+    if (ModelState.IsValid)
     {
-         return View();
-    }
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddTask(AddTaskVM addTask)
-    {
-        if (ModelState.IsValid)
-        {
-            var user = await _userService.GetLoggedUser();
-            if (user == null)
+        var user = await _userService.GetLoggedUser();
+        if (user == null)
         {
             TempData["Failure"] = "Sua sessão expirou, faça login novamente!";
         }
@@ -133,27 +132,19 @@ public class HomeController : Controller
                 Description = addTask.Description,
                 UserId = user.Id
             };
-await _dbContext.ToDos.AddAsync(toDo);
-await _dbContext.SaveChangesAsync();
-TempData["Success"] = "Tarefa criada com sucesso! Redirecionando...";
+            await _dbContext.ToDos.AddAsync(toDo);
+            await _dbContext.SaveChangesAsync();
+            TempData["Success"] = "Tarefa criada com sucesso! Redirecionando...";
         }
     }
     return View(addTask);
 }
-    [AllowAnonymous]
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-    
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-   
-     public IActionResult Error()
+    public IActionResult Error()
     {
-        return View(new ErrorViewModel
-        {
-            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+        return View(new ErrorViewModel {
+            RequestId = Activity.Current?.Id ??
+HttpContext.TraceIdentifier
         });
     }
-};
+}

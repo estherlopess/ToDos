@@ -109,10 +109,7 @@ body {
 }
 
 .error-message {
-    color: darkred;
-    font-size: 14px;
-    margin-top: 10px;
-    font-weight: 600;
+    color: #c62828;
 }
 
 .remember-forgot {

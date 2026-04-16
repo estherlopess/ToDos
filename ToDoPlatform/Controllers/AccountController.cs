@@ -1,60 +1,49 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ToDoPlatform.Data;
-using ToDoPlatform.Models;
 using ToDoPlatform.Services;
 using ToDoPlatform.ViewModels;
-
 namespace ToDoPlatform.Controllers;
-
 public class AccountController : Controller
 {
     private readonly ILogger<AccountController> _logger;
     private readonly IUserService _userService;
-
     public AccountController(ILogger<AccountController> logger, IUserService userService)
     {
         _logger = logger;
         _userService = userService;
     }
-
     [HttpGet]
     public IActionResult Login(string returnUrl)
     {
         LoginVM loginVM = new()
         {
-            ReturnUrl = returnUrl ?? Url.Content("~/")
+        ReturnUrl = returnUrl ?? Url.Content("~/")
         };
         return View(loginVM);
     }
-
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginVM loginVM)
+    public async Task<IActionResult>Login(LoginVM loginVM) 
     {
         if (ModelState.IsValid)
         {
             var result = await _userService.Login(loginVM);
-
             if (result.Succeeded)
                 TempData["Success"] = "Login realizado com sucesso! Redirecionando...";
-            else if (result.IsLockedOut)
+        else if (result.IsLockedOut)
+
                 TempData["Failure"] = "Usuário bloqueado por muitas tentativas.";
-            else if (result.IsNotAllowed)
+        else if (result.IsNotAllowed)
+
                 TempData["Failure"] = "Usuário sem permissão para acessar o sistema.";
-            else
+        else
+
                 TempData["Failure"] = "E-mail ou senha incorretos. Tente novamente.";
         }
         else
-        {
             TempData["Failure"] = "Dados inválidos. Verifique os campos preenchidos.";
-        }
 
         return View(loginVM);
     }
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
@@ -62,10 +51,10 @@ public class AccountController : Controller
         await _userService.Logout();
         return RedirectToAction("Login", "Account");
     }
-
-    // ===== REGISTER ATUALIZADO =====
+    public IActionResult Profile() => View();
 
     [HttpGet]
+
     public IActionResult Register()
     {
         return View();
@@ -76,28 +65,17 @@ public class AccountController : Controller
     public async Task<IActionResult> Register(RegisterVM registerVM)
     {
         if (ModelState.IsValid && registerVM.Terms)
-        {
+        {  
             var result = await _userService.Register(registerVM);
-
             if (result.Count == 0)
-            {
                 TempData["Success"] = "Conta criada com sucesso! Redirecionando...";
-            }
-            else
-            {
+            else {
                 foreach (var error in result)
-                {
                     TempData["Failure"] += error + "\n";
-                }
             }
         }
         else
-        {
             TempData["Failure"] = "Dados inválidos. Verifique os campos preenchidos.";
-        }
-
         return View(registerVM);
     }
-
-    public IActionResult Profile() => View();
 }
